@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -42,7 +43,7 @@ public class ProductHttpAdapterTest {
     @Test
     @DisplayName("POST /v1/products - SUCCESS")
     void shouldCreateProductSuccessfully() throws Exception {
-        final var product = new Product(null, "Camisa Mondrian", BigDecimal.valueOf(89.90), Color.BRANCO);
+        final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
         final var requestBody = objectMapper.writeValueAsString(product);
         final var id = UUID.randomUUID();
 
@@ -54,5 +55,31 @@ public class ProductHttpAdapterTest {
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", containsString(id.toString())));
+    }
+
+    @Test
+    @DisplayName("POST /v1/products - BAD REQUEST")
+    void shouldReturnBadRequestWhenValidationFails() throws Exception {
+        final var testCases = List.of(
+                new Product(null, "", BigDecimal.valueOf(89.90), Color.BRANCO),
+                new Product(null, "  ", BigDecimal.valueOf(89.90), Color.BRANCO),
+                new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), null),
+                new Product(null, "Camisa Teste", null, Color.BRANCO),
+                new Product(null, "Camisa Teste", BigDecimal.ZERO, Color.BRANCO)
+        );
+
+        for (Product product : testCases) {
+            testBadRequest(product);
+        }
+    }
+
+    private void testBadRequest(final Product product) throws Exception {
+        final var requestBody = objectMapper.writeValueAsString(product);
+
+        mockMvc.perform(post(API_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }
