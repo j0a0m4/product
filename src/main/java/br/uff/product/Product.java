@@ -1,4 +1,7 @@
 package br.uff.product;
 
-public record Product() {
+import java.math.BigDecimal;
+import java.util.UUID;
+
+public record Product(UUID id, String name, BigDecimal price, Color color) {
 }

@@ -10,16 +10,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping("/v1/products")
 public class ProductHttpAdapter {
-    final ProductsUseCases productsUseCases;
+    final ProductUseCases productUseCases;
 
-    public ProductHttpAdapter(final ProductsUseCases productsUseCases) {
-        this.productsUseCases = productsUseCases;
+    public ProductHttpAdapter(final ProductUseCases productUseCases) {
+        this.productUseCases = productUseCases;
     }
 
     @PostMapping
     public ResponseEntity<Object> createProduct(final @RequestBody Product product,
                                                 final UriComponentsBuilder uriBuilder) {
-        final var id = productsUseCases.createProduct(product);
+        final var id = productUseCases.createProduct(product);
         final var location = uriBuilder.path("/v1/products/{id}").build(id);
         return ResponseEntity.created(location).build();
     }

@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -36,16 +37,16 @@ public class ProductHttpAdapterTest {
     ProductHttpAdapter productHttpAdapter;
 
     @MockBean
-    ProductsUseCases productsUseCases;
+    ProductUseCases productUseCases;
 
     @Test
     @DisplayName("POST /v1/products - SUCCESS")
     void shouldCreateProductSuccessfully() throws Exception {
-        final var product = new Product();
+        final var product = new Product(null, "Camisa Mondrian", BigDecimal.valueOf(89.90), Color.BRANCO);
         final var requestBody = objectMapper.writeValueAsString(product);
         final var id = UUID.randomUUID();
 
-        doReturn(id).when(productsUseCases).createProduct(any());
+        doReturn(id).when(productUseCases).createProduct(any());
 
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON)

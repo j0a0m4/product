@@ -2,6 +2,6 @@ package br.uff.product;
 
 import java.util.UUID;
 
-public interface ProductsUseCases {
+public interface ProductUseCases {
     UUID createProduct(final Product product);
 }

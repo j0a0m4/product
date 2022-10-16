@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 
 @Service
-public class ProductsService implements ProductsUseCases {
+public class ProductService implements ProductUseCases {
     @Override
     public UUID createProduct(Product product) {
         return null;
