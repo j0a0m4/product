@@ -210,4 +210,21 @@ public class ProductHttpAdapterTest {
                     .andExpect(status().isNotFound());
         }
     }
+
+    @Nested
+    class UpdateProduct {
+        @Test
+        @DisplayName("PUT /v1/products - SUCCESS")
+        void shouldUpdateProductSuccessfully() throws Exception {
+            final var id = UUID.randomUUID().toString();
+            final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+            final var requestBody = objectMapper.writeValueAsString(product);
+
+            mockMvc.perform(put(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON)
+                            .content(requestBody))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
+        }
+    }
 }

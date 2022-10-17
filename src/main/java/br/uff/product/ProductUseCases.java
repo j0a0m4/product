@@ -10,4 +10,6 @@ public interface ProductUseCases {
     Product getById(String id);
 
     void deleteById(String id);
+
+    void updateById(String id, Product product);
 }

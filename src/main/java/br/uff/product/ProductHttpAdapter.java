@@ -17,7 +17,7 @@ public class ProductHttpAdapter {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createProduct(final @RequestBody @Valid Product product,
+    public ResponseEntity<Object> createProduct(@RequestBody @Valid final Product product,
                                                 final UriComponentsBuilder uriBuilder) {
         final var id = productUseCases.create(product);
         final var location = uriBuilder.path("/v1/products/{id}").build(id);
@@ -25,20 +25,27 @@ public class ProductHttpAdapter {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> findAllProducts() {
+    public ResponseEntity<List<Product>> findAll() {
         final var products = productUseCases.getAll();
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> findOneProduct(@PathVariable("id") final String id) {
+    public ResponseEntity<Product> findById(@PathVariable("id") final String id) {
         final var product = productUseCases.getById(id);
         return ResponseEntity.ok(product);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Product> deleteOneProduct(@PathVariable("id") final String id) {
+    public ResponseEntity<Product> deleteById(@PathVariable("id") final String id) {
         productUseCases.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Product> updateById(@PathVariable("id") final String id,
+                                              @RequestBody @Valid final Product product) {
+         productUseCases.updateById(id, product);
         return ResponseEntity.noContent().build();
     }
 }

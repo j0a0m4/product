@@ -33,4 +33,16 @@ public class ProductService implements ProductUseCases {
         productsRepository.findById(id).orElseThrow();
         productsRepository.deleteById(id);
     }
+
+    @Override
+    public void updateById(String id, Product product) {
+        productsRepository.findById(id).orElseThrow();
+        final var updatedProduct = Product.builder()
+                .id(id)
+                .name(product.getName())
+                .price(product.getPrice())
+                .color(product.getColor())
+                .build();
+        productsRepository.save(updatedProduct);
+    }
 }
