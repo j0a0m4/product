@@ -19,7 +19,12 @@ public class ProductService implements ProductUseCases {
     }
 
     @Override
-    public List<Product> getProducts() {
+    public List<Product> getAllProducts() {
         return productsRepository.findAll();
+    }
+
+    @Override
+    public Product getProductById(final String id) {
+        return productsRepository.findById(id).orElseThrow();
     }
 }

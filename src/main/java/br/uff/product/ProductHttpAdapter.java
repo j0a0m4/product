@@ -26,7 +26,13 @@ public class ProductHttpAdapter {
 
     @GetMapping
     public ResponseEntity<List<Product>> findAllProducts() {
-        final var products = productUseCases.getProducts();
+        final var products = productUseCases.getAllProducts();
         return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> findOneProduct(@PathVariable("id") final String id) {
+        final var product = productUseCases.getProductById(id);
+        return ResponseEntity.ok(product);
     }
 }

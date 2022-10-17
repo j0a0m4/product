@@ -110,7 +110,7 @@ public class ProductHttpAdapterTest {
     }
 
     @Nested
-    class ReadProduct {
+    class ReadAllProducts {
         @Test
         @DisplayName("GET /v1/products - SUCCESS")
         void shouldReadAllProductSuccessfully() throws Exception {
@@ -121,7 +121,7 @@ public class ProductHttpAdapterTest {
 
             doReturn(productsMock)
                     .when(productUseCases)
-                    .getProducts();
+                    .getAllProducts();
 
             mockMvc.perform(get(API_ENDPOINT)
                             .contentType(APPLICATION_JSON))
@@ -137,12 +137,33 @@ public class ProductHttpAdapterTest {
         void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
             doThrow(new RuntimeException("Test Exception"))
                     .when(productUseCases)
-                    .getProducts();
+                    .getAllProducts();
 
             mockMvc.perform(get(API_ENDPOINT)
                             .contentType(APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isInternalServerError());
+        }
+    }
+
+    @Nested
+    class ReadProduct {
+        @Test
+        @DisplayName("GET /v1/products/{id} - SUCCESS")
+        void shouldReadAllProductSuccessfully() throws Exception {
+            final var id = UUID.randomUUID().toString();
+            final var product = new Product(id, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+
+
+            doReturn(product)
+                    .when(productUseCases)
+                    .getProductById(id);
+
+            mockMvc.perform(get(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(jsonPath("$").isNotEmpty())
+                    .andExpect(status().isOk());
         }
     }
 }
