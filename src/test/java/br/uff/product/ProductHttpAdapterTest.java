@@ -15,15 +15,16 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -101,7 +102,7 @@ public class ProductHttpAdapterTest {
             final var requestBody = objectMapper.writeValueAsString(product);
 
             mockMvc.perform(post(API_ENDPOINT)
-                            .contentType(APPLICATION_JSON)
+                            .contentType(APPLICATION_JSON_VALUE)
                             .content(requestBody))
                     .andDo(print())
                     .andExpect(status().isBadRequest());
@@ -125,7 +126,23 @@ public class ProductHttpAdapterTest {
             mockMvc.perform(get(API_ENDPOINT)
                             .contentType(APPLICATION_JSON))
                     .andDo(print())
+                    .andExpect(content().contentType(APPLICATION_JSON))
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$", hasSize(2)))
                     .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("GET /v1/products - INTERNAL SERVER ERROR")
+        void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
+            doThrow(new RuntimeException("Test Exception"))
+                    .when(productUseCases)
+                    .getProducts();
+
+            mockMvc.perform(get(API_ENDPOINT)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isInternalServerError());
         }
     }
 }

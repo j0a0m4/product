@@ -20,6 +20,6 @@ public class ProductService implements ProductUseCases {
 
     @Override
     public List<Product> getProducts() {
-        return null;
+        return productsRepository.findAll();
     }
 }
