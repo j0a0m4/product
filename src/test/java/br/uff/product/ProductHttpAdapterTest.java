@@ -194,5 +194,20 @@ public class ProductHttpAdapterTest {
                     .andDo(print())
                     .andExpect(status().isNoContent());
         }
+
+        @Test
+        @DisplayName("DELETE /v1/products/{id} - NOT FOUND")
+        void shouldReturnNotFoundWhenProductIsNotFound() throws Exception {
+            final var id = UUID.randomUUID().toString();
+
+            doThrow(new NoSuchElementException())
+                    .when(productUseCases)
+                    .deleteById(id);
+
+            mockMvc.perform(delete(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
     }
 }
