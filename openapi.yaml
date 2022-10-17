@@ -1,0 +1,182 @@
+openapi: 3.0.3
+info:
+  title: Products - OpenAPI 3.0
+  description: 'The products service allows you to store product information'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8080/product/v1
+tags:
+  - name: products
+    description: Everything about your Products
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+paths:
+  /products:
+    post:
+      tags:
+        - products
+      summary: Add a new product to the store
+      description: Add a new product to the store
+      operationId: addProduct
+      requestBody:
+        description: Create a new product in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI to created resource.
+        '400':
+          description: Syntatic error on payload
+        '500':
+          description: Processing error
+    get:
+      tags:
+        - products
+      summary: Find products
+      description: Returns a collection of products
+      operationId: getProducts
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Products'
+        '500':
+          description: processing error
+  /products/{productId}:
+    get:
+      tags:
+        - products
+      summary: Find product by ID
+      description: Returns a single product
+      operationId: getProductById
+      parameters:
+        - name: productId
+          in: path
+          description: ID of product to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 675b1600-bc3f-4322-801d-e961f0615f2b
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '500':
+          description: Processing error
+    put:
+      tags:
+        - products
+      summary: Update an existing product
+      description: Update an existing product by Id
+      operationId: updateProduct
+      parameters:
+        - name: productId
+          in: path
+          description: ID of product to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 675b1600-bc3f-4322-801d-e961f0615f2b
+      requestBody:
+        description: Update an existent product in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+        '400':
+          description: Syntatic error on payload
+        '404':
+          description: Product not found
+        '500':
+          description: Processing error
+    delete:
+      tags:
+        - products
+      summary: Deletes a product
+      description: delete a product
+      operationId: deleteProduct
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to delete
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 675b1600-bc3f-4322-801d-e961f0615f2b
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: Product not found
+        '500':
+          description: Processing error
+components:
+  schemas:
+    Product:
+      required:
+        - name
+        - price
+        - color
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 675b1600-bc3f-4322-801d-e961f0615f2b
+        name:
+          type: string
+          example: Camisa Simples
+        price:
+          type: number
+          example: 49.90
+        color:
+          type: string
+          description: pet status in the store
+          enum:
+            - BRANCO
+            - PRETO
+            - AZUL
+            - AMARELO
+            - VERMELHO
+            - VERDE
+            - BEGE
+            - CINZA
+            - ROSA
+            - ROXO
+    Products:
+      type: array
+      items:
+        $ref: '#/components/schemas/Product'
+

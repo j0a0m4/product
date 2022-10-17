@@ -1,12 +1,13 @@
 # Minicurso de API RESTful com Spring Boot
 
 Seja bem-vinda ao repositório do minicurso. Esse projeto utiliza Java 11 e Gradle como build automation tool.
-
+A especificação pode ser encontrada no arquivo do [OpenAPI](./openapi.yaml)
 
 ## Recursos:
 - [Apresentação de slides](https://www.canva.com/design/DAFNHKZ617g/yCkx-YhpotUabtja8lX00g/view?utm_content=DAFNHKZ617g&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 - [MongoDB Atlas](https://www.mongodb.com/docs/atlas/getting-started/)
 - [Postman](https://www.postman.com)
+- [Swagger](https://editor.swagger.io)
 
 ## Referências:
 - [RESTful API Tutorial](https://restfulapi.net)
