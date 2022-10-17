@@ -2,6 +2,7 @@ package br.uff.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -41,65 +43,89 @@ public class ProductHttpAdapterTest {
     @MockBean
     ProductUseCases productUseCases;
 
-    @Test
-    @DisplayName("POST /v1/products - SUCCESS")
-    void shouldCreateProductSuccessfully() throws Exception {
-        final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
-        final var requestBody = objectMapper.writeValueAsString(product);
-        final var id = UUID.randomUUID().toString();
+    @Nested
+    class CreateProduct {
+        @Test
+        @DisplayName("POST /v1/products - SUCCESS")
+        void shouldCreateProductSuccessfully() throws Exception {
+            final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+            final var requestBody = objectMapper.writeValueAsString(product);
+            final var id = UUID.randomUUID().toString();
 
-        doReturn(id)
-                .when(productUseCases)
-                .createProduct(any());
+            doReturn(id)
+                    .when(productUseCases)
+                    .createProduct(any());
 
-        mockMvc.perform(post(API_ENDPOINT)
-                        .contentType(APPLICATION_JSON)
-                        .content(requestBody))
-                .andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString(id)));
-    }
+            mockMvc.perform(post(API_ENDPOINT)
+                            .contentType(APPLICATION_JSON)
+                            .content(requestBody))
+                    .andDo(print())
+                    .andExpect(status().isCreated())
+                    .andExpect(header().string("Location", containsString(id)));
+        }
 
-    @Test
-    @DisplayName("POST /v1/products - BAD REQUEST")
-    void shouldReturnBadRequestWhenValidationFails() throws Exception {
-        final var products = List.of(
-                new Product(null, "", BigDecimal.valueOf(89.90), Color.BRANCO),
-                new Product(null, "  ", BigDecimal.valueOf(89.90), Color.BRANCO),
-                new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), null),
-                new Product(null, "Camisa Teste", null, Color.BRANCO),
-                new Product(null, "Camisa Teste", BigDecimal.ZERO, Color.BRANCO)
-        );
+        @Test
+        @DisplayName("POST /v1/products - BAD REQUEST")
+        void shouldReturnBadRequestWhenValidationFails() throws Exception {
+            final var products = List.of(
+                    new Product(null, "", BigDecimal.valueOf(89.90), Color.BRANCO),
+                    new Product(null, "  ", BigDecimal.valueOf(89.90), Color.BRANCO),
+                    new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), null),
+                    new Product(null, "Camisa Teste", null, Color.BRANCO),
+                    new Product(null, "Camisa Teste", BigDecimal.ZERO, Color.BRANCO)
+            );
 
-        for (Product product : products) {
-            testBadRequest(product);
+            for (Product product : products) {
+                testBadRequest(product);
+            }
+        }
+
+        @Test
+        @DisplayName("POST /v1/products - INTERNAL SERVER ERROR")
+        void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
+            final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+            final var requestBody = objectMapper.writeValueAsString(product);
+
+            doThrow(new RuntimeException("Test Exception"))
+                    .when(productUseCases)
+                    .createProduct(any());
+
+            mockMvc.perform(post(API_ENDPOINT)
+                            .contentType(APPLICATION_JSON)
+                            .content(requestBody))
+                    .andDo(print())
+                    .andExpect(status().isInternalServerError());
+        }
+
+        private void testBadRequest(final Product product) throws Exception {
+            final var requestBody = objectMapper.writeValueAsString(product);
+
+            mockMvc.perform(post(API_ENDPOINT)
+                            .contentType(APPLICATION_JSON)
+                            .content(requestBody))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest());
         }
     }
 
-    @Test
-    @DisplayName("POST /v1/products - INTERNAL SERVER ERROR")
-    void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
-        final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
-        final var requestBody = objectMapper.writeValueAsString(product);
+    @Nested
+    class ReadProduct {
+        @Test
+        @DisplayName("GET /v1/products - SUCCESS")
+        void shouldReadAllProductSuccessfully() throws Exception {
+            final var productsMock = List.of(
+                    new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO),
+                    new Product(null, "Jaqueta Jeans", BigDecimal.valueOf(349.00), Color.AZUL)
+            );
 
-        doThrow(new RuntimeException("Test Exception"))
-                .when(productUseCases)
-                .createProduct(any());
+            doReturn(productsMock)
+                    .when(productUseCases)
+                    .getProducts();
 
-        mockMvc.perform(post(API_ENDPOINT)
-                        .contentType(APPLICATION_JSON)
-                        .content(requestBody))
-                .andDo(print())
-                .andExpect(status().isInternalServerError());
-    }
-
-    private void testBadRequest(final Product product) throws Exception {
-        final var requestBody = objectMapper.writeValueAsString(product);
-
-        mockMvc.perform(post(API_ENDPOINT)
-                        .contentType(APPLICATION_JSON)
-                        .content(requestBody))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
+            mockMvc.perform(get(API_ENDPOINT)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+        }
     }
 }

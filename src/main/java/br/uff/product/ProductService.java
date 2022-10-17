@@ -2,6 +2,8 @@ package br.uff.product;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductService implements ProductUseCases {
 
@@ -14,5 +16,10 @@ public class ProductService implements ProductUseCases {
     @Override
     public String createProduct(final Product product) {
         return productsRepository.save(product).getId();
+    }
+
+    @Override
+    public List<Product> getProducts() {
+        return null;
     }
 }
