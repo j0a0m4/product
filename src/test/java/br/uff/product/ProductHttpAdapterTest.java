@@ -46,7 +46,7 @@ public class ProductHttpAdapterTest {
     void shouldCreateProductSuccessfully() throws Exception {
         final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
         final var requestBody = objectMapper.writeValueAsString(product);
-        final var id = UUID.randomUUID();
+        final var id = UUID.randomUUID().toString();
 
         doReturn(id)
                 .when(productUseCases)
@@ -57,7 +57,7 @@ public class ProductHttpAdapterTest {
                         .content(requestBody))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", containsString(id.toString())));
+                .andExpect(header().string("Location", containsString(id)));
     }
 
     @Test
