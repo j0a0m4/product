@@ -60,7 +60,7 @@ public class ProductHttpAdapterTest {
     @Test
     @DisplayName("POST /v1/products - BAD REQUEST")
     void shouldReturnBadRequestWhenValidationFails() throws Exception {
-        final var testCases = List.of(
+        final var products = List.of(
                 new Product(null, "", BigDecimal.valueOf(89.90), Color.BRANCO),
                 new Product(null, "  ", BigDecimal.valueOf(89.90), Color.BRANCO),
                 new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), null),
@@ -68,7 +68,7 @@ public class ProductHttpAdapterTest {
                 new Product(null, "Camisa Teste", BigDecimal.ZERO, Color.BRANCO)
         );
 
-        for (Product product : testCases) {
+        for (Product product : products) {
             testBadRequest(product);
         }
     }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1/products")
 public class ProductHttpAdapter {
@@ -17,7 +19,7 @@ public class ProductHttpAdapter {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createProduct(final @RequestBody Product product,
+    public ResponseEntity<Object> createProduct(final @RequestBody @Valid Product product,
                                                 final UriComponentsBuilder uriBuilder) {
         final var id = productUseCases.createProduct(product);
         final var location = uriBuilder.path("/v1/products/{id}").build(id);
