@@ -16,6 +16,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -47,7 +48,9 @@ public class ProductHttpAdapterTest {
         final var requestBody = objectMapper.writeValueAsString(product);
         final var id = UUID.randomUUID();
 
-        doReturn(id).when(productUseCases).createProduct(any());
+        doReturn(id)
+                .when(productUseCases)
+                .createProduct(any());
 
         mockMvc.perform(post(API_ENDPOINT)
                         .contentType(APPLICATION_JSON)
@@ -71,6 +74,23 @@ public class ProductHttpAdapterTest {
         for (Product product : products) {
             testBadRequest(product);
         }
+    }
+
+    @Test
+    @DisplayName("POST /v1/products - INTERNAL SERVER ERROR")
+    void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
+        final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+        final var requestBody = objectMapper.writeValueAsString(product);
+
+        doThrow(new RuntimeException("Test Exception"))
+                .when(productUseCases)
+                .createProduct(any());
+
+        mockMvc.perform(post(API_ENDPOINT)
+                        .contentType(APPLICATION_JSON)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().isInternalServerError());
     }
 
     private void testBadRequest(final Product product) throws Exception {
