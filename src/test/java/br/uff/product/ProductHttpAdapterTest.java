@@ -226,5 +226,23 @@ public class ProductHttpAdapterTest {
                     .andDo(print())
                     .andExpect(status().isNoContent());
         }
+
+        @Test
+        @DisplayName("PUT /v1/products - NOT FOUND")
+        void shouldReturnNotFoundWhenProductIsNotFound() throws Exception {
+            final var id = UUID.randomUUID().toString();
+            final var product = new Product(null, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
+            final var requestBody = objectMapper.writeValueAsString(product);
+
+            doThrow(new NoSuchElementException())
+                    .when(productUseCases)
+                    .updateById(id, product);
+
+            mockMvc.perform(put(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON)
+                            .content(requestBody))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
+        }
     }
 }
