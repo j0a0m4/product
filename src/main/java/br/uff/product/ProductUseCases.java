@@ -4,8 +4,10 @@ package br.uff.product;
 import java.util.List;
 
 public interface ProductUseCases {
-    String createProduct(Product product);
-    List<Product> getAllProducts();
+    String create(Product product);
+    List<Product> getAll();
 
-    Product getProductById(String id);
+    Product getById(String id);
+
+    void deleteById(String id);
 }

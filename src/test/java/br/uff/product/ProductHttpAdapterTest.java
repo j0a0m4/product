@@ -22,8 +22,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -56,7 +55,7 @@ public class ProductHttpAdapterTest {
 
             doReturn(id)
                     .when(productUseCases)
-                    .createProduct(any());
+                    .create(any());
 
             mockMvc.perform(post(API_ENDPOINT)
                             .contentType(APPLICATION_JSON)
@@ -90,7 +89,7 @@ public class ProductHttpAdapterTest {
 
             doThrow(new RuntimeException("Test Exception"))
                     .when(productUseCases)
-                    .createProduct(any());
+                    .create(any());
 
             mockMvc.perform(post(API_ENDPOINT)
                             .contentType(APPLICATION_JSON)
@@ -122,7 +121,7 @@ public class ProductHttpAdapterTest {
 
             doReturn(productsMock)
                     .when(productUseCases)
-                    .getAllProducts();
+                    .getAll();
 
             mockMvc.perform(get(API_ENDPOINT)
                             .contentType(APPLICATION_JSON))
@@ -138,7 +137,7 @@ public class ProductHttpAdapterTest {
         void shouldReturnInternalServerErrorWhenServiceThrowsException() throws Exception {
             doThrow(new RuntimeException("Test Exception"))
                     .when(productUseCases)
-                    .getAllProducts();
+                    .getAll();
 
             mockMvc.perform(get(API_ENDPOINT)
                             .contentType(APPLICATION_JSON))
@@ -158,7 +157,7 @@ public class ProductHttpAdapterTest {
 
             doReturn(product)
                     .when(productUseCases)
-                    .getProductById(id);
+                    .getById(id);
 
             mockMvc.perform(get(API_ENDPOINT + "/" + id)
                             .contentType(APPLICATION_JSON))
@@ -174,12 +173,26 @@ public class ProductHttpAdapterTest {
 
             doThrow(new NoSuchElementException())
                     .when(productUseCases)
-                    .getProductById(id);
+                    .getById(id);
 
             mockMvc.perform(get(API_ENDPOINT + "/" + id)
                             .contentType(APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    class DeleteProduct {
+        @Test
+        @DisplayName("DELETE /v1/products/{id} - SUCCESS")
+        void shouldDeleteOneProductSuccessfully() throws Exception {
+            final var id = UUID.randomUUID().toString();
+
+            mockMvc.perform(delete(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNoContent());
         }
     }
 }

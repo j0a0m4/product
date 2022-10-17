@@ -14,17 +14,23 @@ public class ProductService implements ProductUseCases {
     }
 
     @Override
-    public String createProduct(final Product product) {
+    public String create(final Product product) {
         return productsRepository.save(product).getId();
     }
 
     @Override
-    public List<Product> getAllProducts() {
+    public List<Product> getAll() {
         return productsRepository.findAll();
     }
 
     @Override
-    public Product getProductById(final String id) {
+    public Product getById(final String id) {
         return productsRepository.findById(id).orElseThrow();
+    }
+
+    @Override
+    public void deleteById(String id) {
+        productsRepository.findById(id).orElseThrow();
+        productsRepository.deleteById(id);
     }
 }
