@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
@@ -150,7 +151,7 @@ public class ProductHttpAdapterTest {
     class ReadProduct {
         @Test
         @DisplayName("GET /v1/products/{id} - SUCCESS")
-        void shouldReadAllProductSuccessfully() throws Exception {
+        void shouldReadOneProductSuccessfully() throws Exception {
             final var id = UUID.randomUUID().toString();
             final var product = new Product(id, "Camisa Teste", BigDecimal.valueOf(89.90), Color.BRANCO);
 
@@ -164,6 +165,21 @@ public class ProductHttpAdapterTest {
                     .andDo(print())
                     .andExpect(jsonPath("$").isNotEmpty())
                     .andExpect(status().isOk());
+        }
+
+        @Test
+        @DisplayName("GET /v1/products/{id} - NOT FOUND")
+        void shouldReturnNotFoundWhenProductIsNotFound() throws Exception {
+            final var id = UUID.randomUUID().toString();
+
+            doThrow(new NoSuchElementException())
+                    .when(productUseCases)
+                    .getProductById(id);
+
+            mockMvc.perform(get(API_ENDPOINT + "/" + id)
+                            .contentType(APPLICATION_JSON))
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
         }
     }
 }
