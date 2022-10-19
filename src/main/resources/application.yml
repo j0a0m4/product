@@ -2,3 +2,7 @@ spring:
   data:
     mongodb:
       uri: ${DB_URI}
+logging:
+  level:
+    root: info
+    web: debug
